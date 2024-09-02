@@ -9,6 +9,10 @@ export const productSchema = z.object({
     description: z.string().min(1, "Description is required"),
 });
 
+export const createProductSchema = productSchema.omit({
+    id: true
+})
+
 export const updateProductSchema = productSchema.pick({
     name: true,
     price: true,
@@ -17,3 +21,4 @@ export const updateProductSchema = productSchema.pick({
 
 export type ProductSchema = z.infer<typeof productSchema>;
 export type UpdateProductSchema = z.infer<typeof updateProductSchema>;
+export type CreateProductSchema = z.infer<typeof createProductSchema>;

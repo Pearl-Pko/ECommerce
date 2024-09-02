@@ -1,45 +1,30 @@
 import {
-    productSchema,
+    CreateProductSchema,
+    createProductSchema,
     ProductSchema,
-    UpdateProductSchema,
-    updateProductSchema,
 } from "@/schema/Product";
 import instance from "@/utils/instance";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {GetServerSideProps, InferGetServerSidePropsType} from "next";
-import Image from "next/image";
 import {useRouter} from "next/router";
 import React from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {IoMdCreate} from "react-icons/io";
 
-export const getServerSideProps = (async (context) => {
-    const {id} = context.query;
-
-    const data: ProductSchema = (await instance.get(`/api/products/${id}`))
-        .data;
-    return {props: {data}};
-}) satisfies GetServerSideProps<{data: ProductSchema}>;
-
-export default function Page({
-    data,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Page() {
     const router = useRouter();
 
     const {
         register,
         handleSubmit,
         formState: {errors},
-        reset,
-    } = useForm<UpdateProductSchema>({
-        defaultValues: data,
-        resolver: zodResolver(updateProductSchema),
+    } = useForm<CreateProductSchema>({
+        resolver: zodResolver(createProductSchema),
     });
 
-    const onSubmit: SubmitHandler<UpdateProductSchema> = async (product) => {
+    const onSubmit: SubmitHandler<CreateProductSchema> = async (product) => {
         console.log("product", product);
         try {
-            await instance.put(`/api/products/${data.id}`, product);
+            const data: ProductSchema = (await instance.post(`/api/products`, product)).data;
             router.push(`/products/${data.id}`);
         } catch (error) {
             console.error("Error updating product:", error);
@@ -47,21 +32,21 @@ export default function Page({
     };
 
     return (
-        <div className="">
-            <p className="text-xl mb-3">Edit Product</p>
+        <div className="w-full px-5">
+            <p className="text-xl mb-3">Add Product</p>
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="border-2 p-6 rounded-md"
             >
                 <div className="flex flex-col lg:flex-row w-full gap-4 items-start">
-                    <Image
-                        src={data.url}
-                        alt={data.name}
-                        width={300}
-                        height={200}
-                        className="self-center lg:self-auto"
-                        layout="intrinsic"
-                    />
+                    {/* <Image
+                      src={data.url}
+                      alt={data.name}
+                      width={300}
+                      height={200}
+                      className="self-center lg:self-auto"
+                      layout="intrinsic"
+                  /> */}
                     <div className="flex flex-col gap-2 w-full">
                         <div className="flex flex-col gap-1">
                             <label className="text-gray-600" htmlFor="name">
@@ -75,6 +60,22 @@ export default function Page({
                             {errors.name && (
                                 <p className="bg-red-400 px-2 py-1 text-white text-sm rounded-md">
                                     {errors.name?.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <label className="text-gray-600" htmlFor="url">
+                                Image Link
+                            </label>
+                            <input
+                                id="url"
+                                className="border-2 w-full px-2 py-1 rounded-md"
+                                {...register("url")}
+                            />
+                            {errors.url && (
+                                <p className="bg-red-400 px-2 py-1 text-white text-sm rounded-md">
+                                    {errors.url?.message}
                                 </p>
                             )}
                         </div>
@@ -120,7 +121,7 @@ export default function Page({
                         type="submit"
                         className="bg-blue-400 text-white px-5 py-2 rounded-full"
                     >
-                        Edit
+                        Submit
                     </button>
                 </div>
             </form>

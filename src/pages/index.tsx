@@ -7,7 +7,6 @@ import React from "react";
 
 export const getServerSideProps = (async () => {
     const data: ProductSchema[] = (await instance.get("/api/products")).data;
-    console.log("data", data);
     // Pass data to the page via props
     return {props: {data}};
 }) satisfies GetServerSideProps<{data: ProductSchema[]}>;
@@ -16,8 +15,8 @@ export default function Page({
     data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     return (
-        <div className="grid place-content-center w-screen">
-            <h3 className="text-2xl mb-6">Popular products</h3>
+        <div className="">
+            <h3 className="text-2xl mb-3">Popular Products</h3>
             <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:gap-7">
                 {data.map((item, index) => {
                     return (

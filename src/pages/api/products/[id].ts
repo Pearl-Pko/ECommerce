@@ -1,6 +1,7 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import {ProductSchema, UpdateProductSchema} from "@/schema/Product";
 import {productsData} from "@/data/data";
+import {MdDeleteOutline} from "react-icons/md";
 
 export default function handler(
     req: NextApiRequest,
@@ -25,18 +26,24 @@ export default function handler(
             const productIndex = productsData.findIndex((p) => p.id === +id);
 
             if (productIndex >= 0) {
-
                 const newProduct = {
                     ...productsData[productIndex],
                     ...{name, price, description},
                 };
-                console.log("yes updated");
                 productsData[productIndex] = newProduct;
                 return res.status(200).json(newProduct);
             } else {
                 return res.status(404).json({message: "Product not found"});
             }
         }
-        case "DELETE":
+        case "DELETE": {
+            const productIndex = productsData.findIndex((p) => p.id === +id);
+            if (productIndex >= 0) {
+                productsData.splice(productIndex, 1);
+                return res.status(204).json({message: "Successfully deleted"});
+            } else {
+                return res.status(404).json({message: "Product not found"});
+            }
+        }
     }
 }
